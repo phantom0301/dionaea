@@ -163,7 +163,7 @@ class mysqld(connection):
 			try:
 				query = p.Query.decode('utf-8')
 				print(query)
-                                result = self.cursor.execute(query)
+				result = self.cursor.execute(query)
 				print(result)
 				if result.description is None:
 					r = MySQL_Result_OK()
