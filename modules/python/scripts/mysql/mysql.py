@@ -89,9 +89,9 @@ class mysqld(connection):
 
 	def _handle_COM_QUERY(self, p):
 		r = None
-		if p.Query.startswith(b"SET "):
+		if p.Query.upper().startswith(b"SET "):
 			r = MySQL_Result_OK(Message="#2")
-		elif p.Query == b'select @@version_comment limit 1':
+		elif p.Query.lower() == b'select @@version_comment limit 1' or p.Query.lower() == b'select @@version':
 			r = [MySQL_Result_Header(FieldCount=1),
 
 				MySQL_Result_Field(Catalog='def',
@@ -103,10 +103,10 @@ class mysqld(connection):
 					Decimals=0),
 				MySQL_Result_EOF(ServerStatus=0x002),
 
-				MySQL_Result_Row_Data(ColumnValues=['Gentoo Linux mysql-5.0.54\0']),
+				MySQL_Result_Row_Data(ColumnValues=['5.0.32-Debian_7etch1-log \0']),
 				MySQL_Result_EOF(ServerStatus=0x002)]
 
-		elif p.Query == b'SELECT DATABASE()':
+		elif p.Query.upper() == b'SELECT DATABASE()':
 			r = [MySQL_Result_Header(FieldCount=1),
 
 				 MySQL_Result_Field(Catalog='def',
@@ -120,7 +120,7 @@ class mysqld(connection):
 
 				MySQL_Result_Row_Data(ColumnValues=[self.database]),
 				MySQL_Result_EOF(ServerStatus=0x002)]
-		elif p.Query == b'show databases':
+		elif p.Query.lower() == b'show databases':
 			r = [MySQL_Result_Header(FieldCount=1),
 
 				MySQL_Result_Field(Catalog='def',
@@ -138,7 +138,7 @@ class mysqld(connection):
 
 #			r.append(MySQL_Result_Row_Data(ColumnValues=['information_schema']))
 			r.append(MySQL_Result_EOF(ServerStatus=0x002))
-		elif p.Query == b'show tables':
+		elif p.Query.lower() == b'show tables':
 			r = [MySQL_Result_Header(FieldCount=1),
 
 				MySQL_Result_Field(Catalog='def',
@@ -163,13 +163,7 @@ class mysqld(connection):
 			try:
 				query = p.Query.decode('utf-8')
 				print(query)
-                               	if query == "set autocommit=0" or query == "SET AUTOCOMMIT=0":
-                                    result = "Query OK"
-                                elif "DROP FUNCTION" in query or "drop function" in query:
-                                    funcname = query.split(" ")[-1].strip(";")
-                                    result = "ERROR 1305(42000): FUNCTION(UDF) " + funcname + " does not exist"
-                                else:
-                                    result = self.cursor.execute(query)
+                                result = self.cursor.execute(query)
 				print(result)
 				if result.description is None:
 					r = MySQL_Result_OK()
@@ -197,7 +191,7 @@ class mysqld(connection):
 					r.append(MySQL_Result_EOF(ServerStatus=0x002))
 			except Exception as e:
 				logger.warn("SQL ERROR %s" % e)
-				r = MySQL_Result_Error(Message="Learn SQL!")
+				r = MySQL_Result_Error(Message='(1064, "You have an error in your SQL syntax; check the manual that corresponds to your MariaDB server version for the right syntax to use near ' + "'" + query + "'" + ' at line 1")')
 		return r
 
 	def handle_io_in(self,data):
