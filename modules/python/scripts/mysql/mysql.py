@@ -163,7 +163,13 @@ class mysqld(connection):
 			try:
 				query = p.Query.decode('utf-8')
 				print(query)
-				result = self.cursor.execute(query)
+                               	if query == "set autocommit=0" or query == "SET AUTOCOMMIT=0":
+                                    result = "Query OK"
+                                elif "DROP FUNCTION" in query or "drop function" in query:
+                                    funcname = query.split(" ")[-1].strip(";")
+                                    result = "ERROR 1305(42000): FUNCTION(UDF) " + funcname + " does not exist"
+                                else:
+                                    result = self.cursor.execute(query)
 				print(result)
 				if result.description is None:
 					r = MySQL_Result_OK()

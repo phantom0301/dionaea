@@ -2561,13 +2561,13 @@ bool mkcert(SSL_CTX *ctx)
 	name=X509_get_subject_name(x);
 
 	X509_NAME_add_entry_by_txt(name,"C",
-							   MBSTRING_ASC, (const unsigned char *)"DE", -1, -1, 0);
+							   MBSTRING_ASC, (const unsigned char *)"JP", -1, -1, 0);
 	X509_NAME_add_entry_by_txt(name,"CN",
-							   MBSTRING_ASC, (const unsigned char *)"Nepenthes Development Team", -1, -1, 0);
+							   MBSTRING_ASC, (const unsigned char *)"MySrvs", -1, -1, 0);
 	X509_NAME_add_entry_by_txt(name,"O",
-							   MBSTRING_ASC, (const unsigned char *)"dionaea.carnivore.it", -1, -1, 0);
+							   MBSTRING_ASC, (const unsigned char *)"none", -1, -1, 0);
 	X509_NAME_add_entry_by_txt(name,"OU",
-							   MBSTRING_ASC, (const unsigned char *)"anv", -1, -1, 0);
+							   MBSTRING_ASC, (const unsigned char *)"none", -1, -1, 0);
 
 
 	/* Its self signed so set the issuer name to be the same as the
